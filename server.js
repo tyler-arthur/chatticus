@@ -25,10 +25,10 @@ app.get("*", (req, res) => {
 io.on('connection', socket => {
   const { id } = socket.client;
   console.log(`User connected: ${id}`);
-
   // Chat socket
   socket.on('chat message', msg => {
-    console.log(`${id}: ${msg}`);
+    // console.log(`${id}: ${msg}`);
+    io.emit('chat message', {id, msg});
   });
 });
 
