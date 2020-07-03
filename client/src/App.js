@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-// import Room from './components/Room'
+// import Sidebar from './components/Sidebar';
 import io from 'socket.io-client';
 import UseForm from './utils/useForm';
 
@@ -8,16 +8,17 @@ const socket = io.connect('http://localhost:3001')
 function App() {
 
   const [usernameState, setUsernameState] = useState(true)
-  // const [room, setRoom] = useState('General');
+  const [rooms, setRooms] = useState(['General', 'Work', 'Random']);
   const [chatState, setChatState] = useState(false);
   const [messages, setMessages] = useState([]);
 
   const { values, setValues, handleChange } = UseForm(
     {
       username: "",
-      message: ""
+      message: "",
+      newRoom: ""
     }
-  )
+  );
 
   const usernameSubmit = e => {
     e.preventDefault();
@@ -38,21 +39,34 @@ function App() {
     setValues({ message: "" })
   }
 
-  // socket.on('updateChat', (username, data) => {
-  //   setMessages(messages => [...messages, { username, data }])
-  // })
+  const joinRoom = (obj) => {
+    socket.emit('switchRoom', obj)
+  }
+
+  const createRoom = e => {
+    e.preventDefault()
+    socket.emit('createRoom', values.newRoom);
+    setValues({ newRoom: ""})
+  }
 
   useEffect(() => {
-    socket.on('updateChat', (data) => {
-      // console.log(username)
-      console.log(data);
-      setMessages(messages => messages.concat((data)))
+    socket.on('updateRoom', data => {
+      setRooms(data);
     });
+
+    socket.on('updateChat', data => {
+      console.log(data);
+      setMessages(messages => messages.concat(data))
+    });
+
     socket.on('changeRoom', setMessages([]));
-  }, [socket])
+  }, []);
 
   return (
     <div>
+    <nav className="h-12 w-full bg-custom-blue text">
+      <p>Chatticus</p>
+    </nav>
       <h1>Welcome to Chatticus!</h1>
       {usernameState === true ?
         <form onSubmit={usernameSubmit}>
@@ -98,21 +112,22 @@ function App() {
             />
             <button type="submit">Send</button>
           </form>
-          <button onClick={
-            () => {
-              socket.emit('switchRoom', 'General');
+          <div>
+            <h1>Join a Room</h1>  
+            {
+              rooms.map((room, i) => (
+                <button className=""
+                  key={i}
+                  onClick={() => joinRoom(room)}
+                >
+                  {room}
+                </button>
+              ))
             }
-          }>General</button>
-          <button onClick={
-            () => {
-              socket.emit('switchRoom', 'Work')
-            }
-          }>Work</button>
-          <button onClick={
-            () => {
-              socket.emit('switchRoom', 'Random')
-            }
-          }>Random</button>
+            <div>
+              
+            </div>
+          </div>
         </React.Fragment>
       }
     </div>
@@ -120,3 +135,26 @@ function App() {
 }
 
 export default App;
+
+// TODO: Work in progress for dynamic room creation
+// <form className=""
+//   onSubmit={createRoom}
+// >
+//   <label className=""
+//     htmlFor="createRoom"
+//   >
+//   Create a Room
+//   </label>
+//   <input className=""
+//     name="createRoom"
+//     type="text"
+//     required
+//     onChange={handleChange}
+//     value={values.newRoom}
+//   />
+//   <button className=""
+//     type="submit"
+//   >
+//     Create Room
+//   </button>
+// </form>

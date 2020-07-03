@@ -58,11 +58,8 @@ io.on('connection', socket => {
       message: `${username} has connected to this room`
     }
     );
-    // socket.emit(
-    //   'updateRooms', 
-    //   rooms, 
-    //   'General'
-    // );
+    socket.emit('updateRooms', rooms);
+    socket.broadcast.emit('updateRooms', rooms)
   });
 
   // Handle chat messaging
@@ -74,6 +71,13 @@ io.on('connection', socket => {
       }
     );
   });
+
+  // Handle creating new channels
+  socket.on('createRoom', data => {
+    rooms.push(data);
+    socket.emit('updateRooms', rooms)
+    socket.broadcast.emit('updateRooms', rooms)
+  })
 
   // Handle switching channels
   socket.on('switchRoom', newRoom => {
@@ -106,22 +110,22 @@ io.on('connection', socket => {
     socket.emit('updateRooms');
   });
 
-  // // Handle disconnects
-  // socket.on('disconnect', () => {
-  //   // Remove user from global list
-  //   delete usernames[socket.username];
-  //   // Update list of users in chat
-  //   io.sockets.emit('updateUsers', usernames);
-  //   // Broadcast user has disconnected
-  //   socket.broadcast.emit('updateChat',
-  //   {
-  //     username: 'Chattibot',
-  //     message: `${socket.username} has disconnected`
-  //   }
-  //   );
-  //   // Remove user from current room
-  //   socket.leave(socket.room);
-  // });
+  // Handle disconnects
+  socket.on('disconnect', () => {
+    // Remove user from global list
+    delete usernames[socket.username];
+    // Update list of users in chat
+    io.sockets.emit('updateUsers', usernames);
+    // Broadcast user has disconnected
+    socket.broadcast.emit('updateChat',
+    {
+      username: 'Chattibot',
+      message: `${socket.username} has disconnected`
+    }
+    );
+    // Remove user from current room
+    socket.leave(socket.room);
+  });
 });
 
 

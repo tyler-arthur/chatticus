@@ -18,6 +18,14 @@ module.exports = {
       black: '#000',
       white: '#fff',
 
+      custom: {
+        pink: '#ea526f',
+        black: '#070600',
+        white: '#F7F7FF',
+        aqua: '#23B5D3',
+        blue: '#279AF1'
+      },
+
       gray: {
         100: '#f7fafc',
         200: '#edf2f7',
