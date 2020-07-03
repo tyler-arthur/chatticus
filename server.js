@@ -21,20 +21,27 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
 
-let rooms = ['General'];
+// let rooms = [
+//   {
+//     roomName: "General",
+//     users: []
+//   }
+// ];
+let rooms = ['General', 'Work', 'Random']
 
 let usernames = {};
 
 // Set up connection socket
 io.on('connection', socket => {
-  // Store username of client
+  console.log("Socket connected!")
+
   socket.on('addUser', username => {
     console.log(username)
     socket.username = username;
-    // Place user in "General Channel"
-    socket.room = 'general';
     // Add user to global list
     usernames[username] = username;
+    // Set room to general
+    socket.room = 'General'
     // Send user to "General"
     socket.join('General');
     // Let user know they have connected
@@ -51,26 +58,26 @@ io.on('connection', socket => {
       message: `${username} has connected to this room`
     }
     );
-    socket.emit(
-      'updateRooms', 
-      rooms, 
-      'General'
-    );
+    // socket.emit(
+    //   'updateRooms', 
+    //   rooms, 
+    //   'General'
+    // );
   });
 
   // Handle chat messaging
   socket.on('sendChat', data => {
-    console.log(data)
-    io.to(data.room).emit('updateChat', 
-    {
-      username: data.username,
-      message : data.message
-    }
+    io.to(socket.room).emit('updateChat', 
+      {
+        username: socket.username,
+        message : data.message
+      }
     );
   });
 
   // Handle switching channels
   socket.on('switchRoom', newRoom => {
+    if (newRoom === socket.room) return;
     socket.leave(socket.room);
     socket.join(newRoom);
 
@@ -90,35 +97,31 @@ io.on('connection', socket => {
     // Update room
     socket.room = newRoom;
     // Let new channel know user has connected
-    socket.broadcast.to(newroom).emit('updatechat',
+    socket.broadcast.to(newRoom).emit('updatechat',
     {
       username: 'Chattibot',
       message: `${socket.username} has joined this room`
     }
     );
-    socket.emit(
-      'updateRooms',
-      rooms,
-      newRoom
-    );
+    socket.emit('updateRooms');
   });
 
-  // Handle disconnects
-  socket.on('disconnect', () => {
-    // Remove user from global list
-    delete usernames[socket.username];
-    // Update list of users in chat
-    io.sockets.emit('updateUsers', usernames);
-    // Broadcast user has disconnected
-    socket.broadcast.emit('updateChat',
-    {
-      username: 'Chattibot',
-      message: `${socket.username} has disconnected`
-    }
-    );
-    // Remove user from current room
-    socket.leave(socket.room);
-  });
+  // // Handle disconnects
+  // socket.on('disconnect', () => {
+  //   // Remove user from global list
+  //   delete usernames[socket.username];
+  //   // Update list of users in chat
+  //   io.sockets.emit('updateUsers', usernames);
+  //   // Broadcast user has disconnected
+  //   socket.broadcast.emit('updateChat',
+  //   {
+  //     username: 'Chattibot',
+  //     message: `${socket.username} has disconnected`
+  //   }
+  //   );
+  //   // Remove user from current room
+  //   socket.leave(socket.room);
+  // });
 });
 
 

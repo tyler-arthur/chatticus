@@ -3,12 +3,12 @@ import React, { useState, useEffect } from 'react';
 import io from 'socket.io-client';
 import UseForm from './utils/useForm';
 
+const socket = io.connect('http://localhost:3001')
+
 function App() {
 
-  const socket = io.connect('http://localhost:3001')
-
   const [usernameState, setUsernameState] = useState(true)
-  const [room, setRoom] = useState('General');
+  // const [room, setRoom] = useState('General');
   const [chatState, setChatState] = useState(false);
   const [messages, setMessages] = useState([]);
 
@@ -29,12 +29,10 @@ function App() {
   const messageSubmit = e => {
     e.preventDefault();
     socket.emit('sendChat',
-    {
-      username: values.username,
-      message: values.message,
-      room: room,
-
-    }
+      {
+        username: values.username,
+        message: values.message
+      }
     );
     console.log('sent!')
     setValues({ message: "" })
@@ -49,7 +47,8 @@ function App() {
       // console.log(username)
       console.log(data);
       setMessages(messages => messages.concat((data)))
-    })
+    });
+    socket.on('changeRoom', setMessages([]));
   }, [socket])
 
   return (
@@ -99,6 +98,21 @@ function App() {
             />
             <button type="submit">Send</button>
           </form>
+          <button onClick={
+            () => {
+              socket.emit('switchRoom', 'General');
+            }
+          }>General</button>
+          <button onClick={
+            () => {
+              socket.emit('switchRoom', 'Work')
+            }
+          }>Work</button>
+          <button onClick={
+            () => {
+              socket.emit('switchRoom', 'Random')
+            }
+          }>Random</button>
         </React.Fragment>
       }
     </div>
