@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import UseForm from '../utils/useForm';
 
-const socket = io.connect('http://localhost:3001')
+// const socket = io.connect('http://localhost:3001')
 
 function Room() {
 
