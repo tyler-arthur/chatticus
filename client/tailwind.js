@@ -312,7 +312,9 @@ module.exports = {
       '10/12': '83.333333%',
       '11/12': '91.666667%',
       full: '100%',
-      screen: '100vw',
+      screen: '100vh',
+      'screen-1/2': '50vh',
+      'screen-3/4': '75vh',
     }),
     inset: {
       '0': '0',

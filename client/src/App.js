@@ -49,13 +49,19 @@ function App() {
   }
 
   const joinRoom = (obj) => {
-    socket.emit('switchRoom', obj)
+    socket.emit('switchRoom', obj);
+    setNavState(false);
   }
 
   const createRoom = e => {
     e.preventDefault()
     socket.emit('createRoom', values.newRoom);
     setValues({ newRoom: ""})
+  }
+
+  const disconnect = () => {
+    socket.emit('disconnect');
+    window.location.reload(false);
   }
 
   useEffect(() => {
@@ -75,26 +81,29 @@ function App() {
 
   return (
     <div className="relative bg-custom-green min-h-screen overflow-hidden">
-    <nav className="px-4 flex items-center justify-between h-16 w-full bg-custom-blue text-custom-gold text-3xl shadow">
+    <nav className="px-4 flex items-center justify-between h-16 w-full bg-custom-blue text-custom-gold text-3xl md:text-4xl shadow">
     {navState === false ?
       chatState === true ?
-        <button onClick={() => setNavState(true)}>
-        =
+        <button className="text-xl md:text-2xl"
+          onClick={() => setNavState(true)}
+        >
+          = Rooms
         </button>
         :
-        <button>
-        =
+        <button className="text-xl md:text-2xl">
         </button>
       :
       <React.Fragment>
-        <button onClick={() => setNavState(false)}>
-        X
+        <button className="text-xl md:text-2xl"
+          onClick={() => setNavState(false)}
+        >
+        X Rooms
         </button>
-        <div className="">
-          <h1>Join a Room</h1>  
+        <div className="flex flex-col items-center p-2 top-0 left-0 mt-16 h-auto fixed pt-1 z-10 border-4 border-custom-biege bg-custom-biege text-xl rounded-br-lg">
+          <h1 className="pb-2">Join a Room</h1>  
           {
             rooms.map((room, i) => (
-              <button className=""
+              <button className="w-full py-2 hover:bg-custom-aqua hover:shadow"
                 key={i}
                 onClick={() => joinRoom(room)}
               >
@@ -108,28 +117,32 @@ function App() {
         </div>
       </React.Fragment>
     }
-      <p>Chatticus</p>
-      <button>/</button>
+      <p className="text-center">Chatticus</p>
+      <button className="text-xl md:text-2xl"
+        onClick={disconnect}
+      >
+        Exit
+      </button>
     </nav>
     {usernameState === true ?
-      <div >
-        <h1 className="text-center text-custom-white text-2xl font-extrabold">Welcome to Chatticus!</h1>
-          <form className="flex flex-col items-center space-y-4"
+      <div>
+        <h1 className="mt-16 text-center text-custom-white text-2xl md:text-4xl font-extrabold">Welcome to Chatticus!</h1>
+          <form className="flex flex-col items-center space-y-8"
             onSubmit={usernameSubmit}
           >
-            <label className="p-2 text-xl text-custom-white font-medium"
+            <label className="p-2 text-xl md:text-2xl text-custom-white font-medium"
               htmlFor="username"
             >
               Please create a username for this session
             </label>
-            <input className="p-2 rounded-lg focus:outline-none focus:shadow-outline"
+            <input className="p-2 text-lg md:text-xl rounded-lg focus:outline-none focus:shadow-outline"
               name="username"
               type="text"
               required
               onChange={handleChange}
               value={values.username}
             />
-            <button className="bg-custom-gold p-2 text-custom-blue text-xl font-medium rounded-lg focus:outline-none focus:shadow-outline"
+            <button className="bg-custom-gold p-2 text-custom-blue text-xl md:text-2xl font-medium rounded-lg focus:outline-none focus:shadow-outline"
               type="submit"
             >Let's Go!</button>
           </form>
@@ -141,31 +154,30 @@ function App() {
         null
       :
         <React.Fragment>
-        <div className="relative pt-8 container h-screen w-screen">
-          <div className="h-11/12 p-2 space-y-2 bg-custom-white overflow-scroll">
+          <div className="h-screen-1/2 md:h-screen-3/4 lg mt-2 md:mx-40 flex-shrink-0 md:p-4 md:rounded-lg p-2 space-y-2 bg-custom-white overflow-y-scroll shadow-inner">
             {
               messages.map(({username, message}, i) => (
                 <div className="text-xl"
                   key={i}
                 >
-                  <p><span>{username}: </span><span>{message}</span></p>
+                  <p><span className="underline">{username}</span><span> : {message}</span></p>
                 </div>
               ))
             }
             <div ref={messagesEndRef} />
           </div>
-        </div>
-          <form className="flex m-1"
+          <form className="flex m-2 md:justify-center md:mx-40 lg:mx-32"
             onSubmit={messageSubmit}
           >
             <input className="p-2 flex-grow text-xl rounded-l-lg focus:outline-none focus:shadow-outline"
               name="message"
               type="text"
+              placeholder="Start typing..."
               required
               onChange={handleChange}
               value={values.message}
             />
-            <button className="p-2 bg-custom-gold text-xl text-custom-blue rounded-r-lg focus:outline-none focus:shadow-outline"
+            <button className="p-2 px-6 bg-custom-gold text-xl text-custom-blue rounded-r-lg focus:outline-none focus:shadow-outline"
               type="submit"
               >
                 Send
