@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import UseForm from './utils/useForm';
 import Navbar from './components/Navbar';
+import Username from './components/Username';
 
 const socket = io.connect('http://localhost:3001')
 
@@ -49,27 +50,13 @@ function App() {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
   }
 
-  // const joinRoom = (obj) => {
-  //   socket.emit('switchRoom', obj);
-  //   setNavState(false);
-  // }
-
   const createRoom = e => {
     e.preventDefault()
     socket.emit('createRoom', values.newRoom);
     setValues({ newRoom: ""})
   }
 
-  // const disconnect = () => {
-  //   socket.emit('disconnect');
-  //   window.location.reload(false);
-  // }
-
   useEffect(() => {
-    // socket.on('updateRoom', data => {
-    //   setRooms(data);
-    // });
-
     socket.on('updateChat', data => {
       console.log(data);
       setMessages(messages => messages.concat(data))
@@ -88,27 +75,12 @@ function App() {
     />
     {usernameState === true ?
       <div>
-        <h1 className="mt-16 text-center text-custom-white text-2xl md:text-4xl font-extrabold">Welcome to Chatticus!</h1>
-          <form className="flex flex-col items-center space-y-8"
-            onSubmit={usernameSubmit}
-          >
-            <label className="p-2 text-xl md:text-2xl text-custom-white font-medium"
-              htmlFor="username"
-            >
-              Please create a username for this session
-            </label>
-            <input className="p-2 text-lg md:text-xl rounded-lg focus:outline-none focus:shadow-outline"
-              name="username"
-              type="text"
-              required
-              onChange={handleChange}
-              value={values.username}
-            />
-            <button className="bg-custom-gold p-2 text-custom-blue text-xl md:text-2xl font-medium rounded-lg focus:outline-none focus:shadow-outline"
-              type="submit"
-            >Let's Go!</button>
-          </form>
-        </div>
+        <Username
+          handleChange={handleChange}
+          username={values.username}
+          submit={usernameSubmit}
+        />
+      </div>
       :
         null
       }
