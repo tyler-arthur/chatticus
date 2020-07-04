@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 // import Sidebar from './components/Sidebar';
 import io from 'socket.io-client';
 import UseForm from './utils/useForm';
@@ -7,6 +7,7 @@ const socket = io.connect('http://localhost:3001')
 
 function App() {
 
+  
   const [usernameState, setUsernameState] = useState(true)
   const [rooms, setRooms] = useState(['General', 'Work', 'Random']);
   const [chatState, setChatState] = useState(false);
@@ -39,6 +40,13 @@ function App() {
     setValues({ message: "" })
   }
 
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (messages[0])
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+  }
+
   const joinRoom = (obj) => {
     socket.emit('switchRoom', obj)
   }
@@ -62,30 +70,36 @@ function App() {
     socket.on('changeRoom', setMessages([]));
   }, []);
 
+  useEffect(scrollToBottom, [messages])
+
   return (
-    <div>
-    <nav className="h-12 w-full bg-custom-blue text">
+    <div className="relative bg-custom-green min-h-screen overflow-hidden">
+    <nav className="flex items-center justify-center h-16 w-full bg-custom-blue text-custom-gold text-3xl shadow">
       <p>Chatticus</p>
     </nav>
-      <h1>Welcome to Chatticus!</h1>
-      {usernameState === true ?
-        <form onSubmit={usernameSubmit}>
-          <label className=""
-            htmlFor="username"
+    {usernameState === true ?
+      <div >
+        <h1 className="text-center text-custom-white text-2xl font-extrabold">Welcome to Chatticus!</h1>
+          <form className="flex flex-col items-center space-y-4"
+            onSubmit={usernameSubmit}
           >
-            Please create a username for this session
-          </label>
-          <input className="border border-black"
-            name="username"
-            type="text"
-            required
-            onChange={handleChange}
-            value={values.username}
-          />
-          <button className="border border-black"
-            type="submit"
-          >Submit</button>
-        </form>
+            <label className="p-2 text-xl text-custom-white font-medium"
+              htmlFor="username"
+            >
+              Please create a username for this session
+            </label>
+            <input className="p-2 rounded-lg focus:outline-none focus:shadow-outline"
+              name="username"
+              type="text"
+              required
+              onChange={handleChange}
+              value={values.username}
+            />
+            <button className="bg-custom-gold p-2 text-custom-blue text-xl font-medium rounded-lg focus:outline-none focus:shadow-outline"
+              type="submit"
+            >Let's Go!</button>
+          </form>
+        </div>
       :
         null
       }
@@ -93,24 +107,35 @@ function App() {
         null
       :
         <React.Fragment>
-          <div className="h-64 w-1/3 border border-black">
+        <div className="relative pt-12 container h-screen w-screen">
+          <div className="h-11/12 p-2 space-y-2 bg-custom-white overflow-scroll">
             {
               messages.map(({username, message}, i) => (
-                <div key={i}>
+                <div className="text-xl"
+                  key={i}
+                >
                   <p><span>{username}: </span><span>{message}</span></p>
                 </div>
               ))
             }
+            <div ref={messagesEndRef} />
           </div>
-          <form onSubmit={messageSubmit}>
-            <input className="border border-black"
+        </div>
+          <form className="flex m-1"
+            onSubmit={messageSubmit}
+          >
+            <input className="p-2 flex-grow text-xl rounded-l-lg focus:outline-none focus:shadow-outline"
               name="message"
               type="text"
               required
               onChange={handleChange}
               value={values.message}
             />
-            <button type="submit">Send</button>
+            <button className="p-2 bg-custom-gold text-xl text-custom-blue rounded-r-lg focus:outline-none focus:shadow-outline"
+              type="submit"
+              >
+                Send
+              </button>
           </form>
           <div>
             <h1>Join a Room</h1>  
