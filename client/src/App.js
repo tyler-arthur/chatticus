@@ -11,6 +11,7 @@ function App() {
   const [usernameState, setUsernameState] = useState(true)
   const [rooms, setRooms] = useState(['General', 'Work', 'Random']);
   const [chatState, setChatState] = useState(false);
+  const [navState, setNavState] = useState(false);
   const [messages, setMessages] = useState([]);
 
   const { values, setValues, handleChange } = UseForm(
@@ -74,8 +75,41 @@ function App() {
 
   return (
     <div className="relative bg-custom-green min-h-screen overflow-hidden">
-    <nav className="flex items-center justify-center h-16 w-full bg-custom-blue text-custom-gold text-3xl shadow">
+    <nav className="px-4 flex items-center justify-between h-16 w-full bg-custom-blue text-custom-gold text-3xl shadow">
+    {navState === false ?
+      chatState === true ?
+        <button onClick={() => setNavState(true)}>
+        =
+        </button>
+        :
+        <button>
+        =
+        </button>
+      :
+      <React.Fragment>
+        <button onClick={() => setNavState(false)}>
+        X
+        </button>
+        <div className="">
+          <h1>Join a Room</h1>  
+          {
+            rooms.map((room, i) => (
+              <button className=""
+                key={i}
+                onClick={() => joinRoom(room)}
+              >
+                {room}
+              </button>
+            ))
+          }
+          <div>
+            
+          </div>
+        </div>
+      </React.Fragment>
+    }
       <p>Chatticus</p>
+      <button>/</button>
     </nav>
     {usernameState === true ?
       <div >
@@ -107,7 +141,7 @@ function App() {
         null
       :
         <React.Fragment>
-        <div className="relative pt-12 container h-screen w-screen">
+        <div className="relative pt-8 container h-screen w-screen">
           <div className="h-11/12 p-2 space-y-2 bg-custom-white overflow-scroll">
             {
               messages.map(({username, message}, i) => (
@@ -137,22 +171,7 @@ function App() {
                 Send
               </button>
           </form>
-          <div>
-            <h1>Join a Room</h1>  
-            {
-              rooms.map((room, i) => (
-                <button className=""
-                  key={i}
-                  onClick={() => joinRoom(room)}
-                >
-                  {room}
-                </button>
-              ))
-            }
-            <div>
-              
-            </div>
-          </div>
+          
         </React.Fragment>
       }
     </div>
