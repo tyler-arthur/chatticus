@@ -21,12 +21,15 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
 
+// Array to hold all active rooms
 let rooms = ['General', 'Work', 'Random']
-
+// Holds sockets current room for display
+let room;
+// Stores all usernames until discconnected
 let usernames = {};
-
+// Holds random chat message coloring
 let color;
-
+// List of color class names for random chat color
 const colors = [
   'red-500',
   'red-600',
@@ -53,7 +56,7 @@ const colors = [
   'purple-600',
   'purple-700',
 ]
-
+// Picks a random index from an array
 const colorPicker = (arr, min, max) => {
   const i = Math.floor(Math.random() * (max - min + 1)) + min;
   return arr[i];
@@ -64,7 +67,6 @@ io.on('connection', socket => {
   console.log("Socket connected!")
 
   socket.on('addUser', username => {
-    console.log(username)
     socket.username = username;
     // Add user to global list
     usernames[username] = username;
@@ -72,7 +74,8 @@ io.on('connection', socket => {
     color = colorPicker(colors, 0, colors.length - 1);
     socket.color = color;
     // Set room to general
-    socket.room = 'General'
+    socket.room = 'General';
+    room = socket.room;
     // Send user to "General"
     socket.join('General');
     // Let user know they have connected
@@ -91,8 +94,8 @@ io.on('connection', socket => {
       color: 'gray-600'
     }
     );
-    socket.emit('updateRooms', rooms);
-    socket.broadcast.emit('updateRooms', rooms)
+    socket.emit('updateRoom', {rooms: rooms, room: room});
+    socket.broadcast.emit('updateRoom', {rooms: rooms})
   });
 
   // Handle chat messaging
@@ -109,8 +112,8 @@ io.on('connection', socket => {
   // Handle creating new channels
   socket.on('createRoom', data => {
     rooms.push(data);
-    socket.emit('updateRooms', rooms)
-    socket.broadcast.emit('updateRooms', rooms)
+    socket.emit('updateRoom', {rooms: rooms})
+    socket.broadcast.emit('updateRoom', {rooms: rooms})
   })
 
   // Handle switching channels
@@ -136,15 +139,16 @@ io.on('connection', socket => {
     );
     // Update room
     socket.room = newRoom;
+    room = socket.room;
     // Let new channel know user has connected
-    socket.broadcast.to(newRoom).emit('updatechat',
+    socket.broadcast.to(newRoom).emit('updateChat',
     {
       username: 'Chattibot',
       message: `${socket.username} has joined this room`,
       color: 'gray-600'
     }
     );
-    socket.emit('updateRooms');
+    socket.emit('updateRoom', {rooms: rooms, room: room});
   });
 
   // Handle disconnects
@@ -165,7 +169,6 @@ io.on('connection', socket => {
     socket.leave(socket.room);
   });
 });
-
 
 server.listen(PORT, () => {
   console.log(`🌎 ==> API server now on port ${PORT}!`);

@@ -12,12 +12,24 @@ const Navbar = (props) => {
 
   // state for room menus, to open and close
   const [navState, setNavState] = useState(false);
+  // State for all current active rooms
   const [rooms, setRooms] = useState(['General', 'Work', 'Random']);
+  // state for creating new room
+  const [newRoom, setNewRoom] = useState("");
+  // State for displaying current room
+  const [Room, setRoom] = useState("");
 
   // Sets user to selected room room
   const joinRoom = (obj) => {
     socket.emit('switchRoom', obj);
     setNavState(false);
+  }
+
+  // Sets up new user created rooms
+  const createRoom = e => {
+    e.preventDefault();
+    socket.emit('createRoom', newRoom);
+    setNewRoom("");
   }
 
   // Handles the user disconnecting
@@ -26,7 +38,7 @@ const Navbar = (props) => {
     window.location.reload(false);
   }
 
-  // Cloase nav menu when user clicks outside of it
+  // Close nav menu when user clicks outside of it
   const ref = useOnclickOutside(() => {
     setNavState(false);
   });
@@ -34,18 +46,20 @@ const Navbar = (props) => {
   // Handles user swithcing rooms and recieves server messages as well as broadcasts room change to relavant users
   useEffect(() => {
     socket.on('updateRoom', data => {
-      setRooms(data);
+      setRooms(data.rooms);
+      if(!data.room) return;
+      else setRoom(data.room);
     });
-  }, [])
+  }, [socket])
 
   return (
-    <nav className="px-4 flex items-center flex-grow-0 flex-shrink-0 justify-between h-16 w-full bg-custom-blue text-custom-gold text-3xl md:text-4xl shadow">
+    <nav className="px-4 flex items-center flex-grow-0 flex-shrink-0 justify-between h-16 w-full bg-custom-blue text-custom-gold text-3xl md:text-4xl shadow-lg">
     {navState === false ?
       chatState === true ?
         <button className="text-xl md:text-2xl"
           onClick={() => setNavState(!navState)}
         >
-          <FontAwesomeIcon icon={faBars} /> Rooms
+          <FontAwesomeIcon icon={faBars} /> {Room}
         </button>
         :
         <button className="text-xl md:text-2xl"></button>
@@ -54,14 +68,14 @@ const Navbar = (props) => {
         <button className="text-xl md:text-2xl"
           onClick={() => setNavState(!navState)}
         >
-        X Rooms
+        <FontAwesomeIcon icon={faBars} rotation={90} /> {Room}
         </button>
-        <div className="flex flex-col items-center p-2 top-0 left-0 mt-16 h-auto absolute pt-1 z-10 border-4 border-custom-biege bg-custom-biege text-xl rounded-br-lg"
+        <div className="flex flex-col items-center w-40 p-2 top-0 left-0 mt-16 h-auto absolute pt-1 z-10 border-4 border-custom-biege bg-custom-biege text-xl rounded-br-lg box-border"
           ref={ref}
         >
           {
             rooms.map((room, i) => (
-              <button className="w-full py-2 hover:bg-custom-aqua hover:shadow"
+              <button className="py-2 w-full hover:bg-custom-aqua hover:shadow"
                 key={i}
                 onClick={() => joinRoom(room)}
               >
@@ -69,8 +83,25 @@ const Navbar = (props) => {
               </button>
             ))
           }
-          <div>
-            
+          <div className="">
+            <form className="flex flex-col items-center mt-2 space-y-2"
+              onSubmit={createRoom}
+            >
+              <input className="w-full px-2 text-lg text-black rounded-lg"
+                name="createRoom"
+                type="text"
+                placeholder="Create a Room"
+                maxLength={15}
+                required
+                onChange={e => setNewRoom(e.target.value)}
+                value={newRoom}
+              />
+              <button className="py-2 w-full hover:bg-custom-aqua hover:shadow"
+                type="submit"
+              >
+                Create Room
+              </button>
+            </form>
           </div>
         </div>
       </React.Fragment>
