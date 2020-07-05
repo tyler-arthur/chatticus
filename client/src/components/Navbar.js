@@ -56,7 +56,7 @@ const Navbar = (props) => {
         >
         X Rooms
         </button>
-        <div className="flex flex-col items-center p-2 top-0 left-0 mt-16 h-auto fixed pt-1 z-10 border-4 border-custom-biege bg-custom-biege text-xl rounded-br-lg"
+        <div className="flex flex-col items-center p-2 top-0 left-0 mt-16 h-auto absolute pt-1 z-10 border-4 border-custom-biege bg-custom-biege text-xl rounded-br-lg"
           ref={ref}
         >
           {

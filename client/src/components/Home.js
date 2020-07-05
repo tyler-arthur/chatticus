@@ -92,11 +92,11 @@ const Home = () => {
         <React.Fragment>
           <div className="h-screen-1/2 md:h-screen-3/4 mt-2 md:mx-40 flex-shrink-0 md:p-4 md:rounded-lg p-2 space-y-2 bg-custom-white overflow-y-scroll shadow-inner">
             {
-              messages.map(({username, message}, i) => (
+              messages.map(({username, message, color}, i) => (
                 <div className="text-xl"
                   key={i}
                 >
-                  <p><span className="underline">{username}</span><span> : {message}</span></p>
+                  <p><span className={`underline text-${color} font-medium`} >{username}</span><span> : {message}</span></p>
                 </div>
               ))
             }

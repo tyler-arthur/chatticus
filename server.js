@@ -21,15 +21,43 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
 
-// let rooms = [
-//   {
-//     roomName: "General",
-//     users: []
-//   }
-// ];
 let rooms = ['General', 'Work', 'Random']
 
 let usernames = {};
+
+let color;
+
+const colors = [
+  'red-500',
+  'red-600',
+  'red-700',
+  'orange-500',
+  'orange-600',
+  'orange-700',
+  'yellow-500',
+  'yellow-600',
+  'yellow-700',
+  'green-500',
+  'green-600',
+  'green-700',
+  'teal-500',
+  'teal-600',
+  'teal-700',
+  'blue-500',
+  'blue-600',
+  'blue-700',
+  'indigo-500',
+  'indigo-600',
+  'indigo-700',
+  'purple-500',
+  'purple-600',
+  'purple-700',
+]
+
+const colorPicker = (arr, min, max) => {
+  const i = Math.floor(Math.random() * (max - min + 1)) + min;
+  return arr[i];
+}
 
 // Set up connection socket
 io.on('connection', socket => {
@@ -40,6 +68,9 @@ io.on('connection', socket => {
     socket.username = username;
     // Add user to global list
     usernames[username] = username;
+    // Giving user random color
+    color = colorPicker(colors, 0, colors.length - 1);
+    socket.color = color;
     // Set room to general
     socket.room = 'General'
     // Send user to "General"
@@ -48,14 +79,16 @@ io.on('connection', socket => {
     socket.emit('updateChat',
     {
       username: 'Chattibot',
-      message: "You have connected to General" 
+      message: "You have connected to General",
+      color: 'gray-600'
     }
     );
     // Let channel know user has connected
     socket.broadcast.to('General').emit('updateChat',
     {
       username: 'Chattibot',
-      message: `${username} has connected to this room`
+      message: `${username} has connected to this room`,
+      color: 'gray-600'
     }
     );
     socket.emit('updateRooms', rooms);
@@ -67,7 +100,8 @@ io.on('connection', socket => {
     io.to(socket.room).emit('updateChat', 
       {
         username: socket.username,
-        message : data.message
+        message : data.message,
+        color: socket.color
       }
     );
   });
@@ -88,14 +122,16 @@ io.on('connection', socket => {
     socket.emit('updateChat',
     {
       username: 'Chattibot',
-      message: `You have connected to ${newRoom}` 
+      message: `You have connected to ${newRoom}`,
+      color: 'gray-600'
     }
     );
     // Let previous channel know user has disconnected
     socket.broadcast.to(socket.room).emit('updateChat',
     {
       username: 'Chattibot',
-      message: `${socket.username} has left this room`
+      message: `${socket.username} has left this room`,
+      color: 'gray-600'
     }
     );
     // Update room
@@ -104,7 +140,8 @@ io.on('connection', socket => {
     socket.broadcast.to(newRoom).emit('updatechat',
     {
       username: 'Chattibot',
-      message: `${socket.username} has joined this room`
+      message: `${socket.username} has joined this room`,
+      color: 'gray-600'
     }
     );
     socket.emit('updateRooms');
@@ -112,17 +149,18 @@ io.on('connection', socket => {
 
   // Handle disconnects
   socket.on('disconnect', () => {
-    // Remove user from global list
-    delete usernames[socket.username];
-    // Update list of users in chat
-    io.sockets.emit('updateUsers', usernames);
     // Broadcast user has disconnected
     socket.broadcast.emit('updateChat',
     {
       username: 'Chattibot',
-      message: `${socket.username} has disconnected`
+      message: `${socket.username} has disconnected`,
+      color: 'gray-600'
     }
     );
+    // Remove user from global list
+    delete usernames[socket.username];
+    // Update list of users in chat
+    io.sockets.emit('updateUsers', usernames);
     // Remove user from current room
     socket.leave(socket.room);
   });
