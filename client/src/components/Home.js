@@ -86,7 +86,7 @@ const Home = () => {
         null
       :
         <React.Fragment>
-          <div className="h-screen-1/2 md:h-screen-3/4 lg mt-2 md:mx-40 flex-shrink-0 md:p-4 md:rounded-lg p-2 space-y-2 bg-custom-white overflow-y-scroll shadow-inner">
+          <div className="h-screen-1/2 md:h-screen-3/4 mt-2 md:mx-40 flex-shrink-0 md:p-4 md:rounded-lg p-2 space-y-2 bg-custom-white overflow-y-scroll shadow-inner">
             {
               messages.map(({username, message}, i) => (
                 <div className="text-xl"
@@ -98,7 +98,7 @@ const Home = () => {
             }
             <div ref={messagesEndRef} />
           </div>
-          <form className="flex m-2 md:justify-center md:mx-40 lg:mx-32"
+          <form className="flex m-2 md:justify-center md:mx-40"
             onSubmit={messageSubmit}
           >
             <input className="p-2 flex-grow text-xl rounded-l-lg focus:outline-none focus:shadow-outline"
@@ -111,9 +111,9 @@ const Home = () => {
             />
             <button className="p-2 px-6 bg-custom-gold text-xl text-custom-blue rounded-r-lg focus:outline-none focus:shadow-outline"
               type="submit"
-              >
-                Send
-              </button>
+            >
+              Send
+            </button>
           </form>
           
         </React.Fragment>
