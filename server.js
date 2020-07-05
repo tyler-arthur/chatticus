@@ -22,6 +22,7 @@ app.get("*", (req, res) => {
 });
 
 let rooms = ['General', 'Work', 'Random']
+let room;
 
 let usernames = {};
 
@@ -64,7 +65,6 @@ io.on('connection', socket => {
   console.log("Socket connected!")
 
   socket.on('addUser', username => {
-    console.log(username)
     socket.username = username;
     // Add user to global list
     usernames[username] = username;
@@ -72,7 +72,8 @@ io.on('connection', socket => {
     color = colorPicker(colors, 0, colors.length - 1);
     socket.color = color;
     // Set room to general
-    socket.room = 'General'
+    socket.room = 'General';
+    room = socket.room;
     // Send user to "General"
     socket.join('General');
     // Let user know they have connected
@@ -91,8 +92,8 @@ io.on('connection', socket => {
       color: 'gray-600'
     }
     );
-    socket.emit('updateRooms', rooms);
-    socket.broadcast.emit('updateRooms', rooms)
+    socket.emit('updateRoom', {rooms: rooms, room: room});
+    socket.broadcast.emit('updateRoom', {rooms: rooms, room: room})
   });
 
   // Handle chat messaging
@@ -109,8 +110,8 @@ io.on('connection', socket => {
   // Handle creating new channels
   socket.on('createRoom', data => {
     rooms.push(data);
-    socket.emit('updateRooms', rooms)
-    socket.broadcast.emit('updateRooms', rooms)
+    socket.emit('updateRoom', {rooms: rooms})
+    socket.broadcast.emit('updateRoom', {rooms: rooms})
   })
 
   // Handle switching channels
@@ -136,15 +137,16 @@ io.on('connection', socket => {
     );
     // Update room
     socket.room = newRoom;
+    room = socket.room;
     // Let new channel know user has connected
-    socket.broadcast.to(newRoom).emit('updatechat',
+    socket.broadcast.to(newRoom).emit('updateChat',
     {
       username: 'Chattibot',
       message: `${socket.username} has joined this room`,
       color: 'gray-600'
     }
     );
-    socket.emit('updateRooms');
+    socket.emit('updateRoom', {rooms: rooms, room: room});
   });
 
   // Handle disconnects

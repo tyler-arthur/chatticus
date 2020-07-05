@@ -20,8 +20,7 @@ const Home = () => {
   const { values, setValues, handleChange } = UseForm(
     {
       username: "",
-      message: "",
-      newRoom: ""
+      message: ""
     }
   );
 
@@ -39,10 +38,10 @@ const Home = () => {
     socket.emit('sendChat',
       {
         username: values.username,
-        message: values.message
+        message: values.message,
+        // newRoom: ""
       }
     );
-    console.log('sent!')
     setValues({ message: "" })
   }
 
@@ -58,7 +57,6 @@ const Home = () => {
   useEffect(() => {
     // updates chat from all users
     socket.on('updateChat', data => {
-      console.log(data);
       setMessages(messages => messages.concat(data))
     });
     // sets messages for newly joined room
@@ -127,27 +125,3 @@ const Home = () => {
 };
 
 export default Home;
-
-// TODO: Work in progress for dynamic room creation
-// <form className=""
-//   onSubmit={createRoom}
-// >
-//   <label className=""
-//     htmlFor="createRoom"
-//   >
-//   Create a Room
-//   </label>
-//   <input className=""
-//     name="createRoom"
-//     type="text"
-//     required
-//     onChange={handleChange}
-//     value={values.newRoom}
-//   />
-//   <button className=""
-//     type="submit"
-//   >
-//     Create Room
-//   </button>
-// </form>
-// TODO: Work in progress for dynamic room creation
