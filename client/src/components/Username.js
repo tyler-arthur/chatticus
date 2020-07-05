@@ -2,7 +2,7 @@ import React from 'react';
 
 const Username = props => {
 
-  // const socket = props.socket;
+  // setting up props from Home.js
   const handleChange = props.handleChange;
   const username = props.username;
   const submit = props.submit;

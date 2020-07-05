@@ -4,16 +4,19 @@ import UseForm from '../utils/useForm';
 import Navbar from './Navbar';
 import Username from './Username';
 
+// Creating socket for user session
 const socket = io.connect('http://localhost:3001')
 
 const Home = () => {
 
+  // State for user submission form
   const [usernameState, setUsernameState] = useState(true)
-  // const [rooms, setRooms] = useState(['General', 'Work', 'Random']);
+  // State to show chat
   const [chatState, setChatState] = useState(false);
-  // const [navState, setNavState] = useState(false);
+  // State to hold messages
   const [messages, setMessages] = useState([]);
 
+  // setting form values, importing generic input handler
   const { values, setValues, handleChange } = UseForm(
     {
       username: "",
@@ -22,6 +25,7 @@ const Home = () => {
     }
   );
 
+  // Submits username and sets states tos how chat
   const usernameSubmit = e => {
     e.preventDefault();
     socket.emit('addUser', values.username);
@@ -29,6 +33,7 @@ const Home = () => {
     setChatState(true);
   }
 
+  // Submits messages from user
   const messageSubmit = e => {
     e.preventDefault();
     socket.emit('sendChat',
@@ -41,32 +46,31 @@ const Home = () => {
     setValues({ message: "" })
   }
 
+  // reference for auto bottom scroll
   const messagesEndRef = useRef(null);
 
+  // Scrolls to bottom message when messages exceeds container size
   const scrollToBottom = () => {
     if (messages[0])
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
   }
 
-  // const createRoom = e => {
-  //   e.preventDefault()
-  //   socket.emit('createRoom', values.newRoom);
-  //   setValues({ newRoom: ""})
-  // }
-
   useEffect(() => {
+    // updates chat from all users
     socket.on('updateChat', data => {
       console.log(data);
       setMessages(messages => messages.concat(data))
     });
-
+    // sets messages for newly joined room
     socket.on('changeRoom', setMessages([]));
   }, []);
 
+  // scrolls to bottom of chat once messages exceed container size
   useEffect(scrollToBottom, [messages])
 
   return (
-    <div className="relative bg-custom-green min-h-screen overflow-hidden">
+    <div className="relative bg-custom-green min-h-screen overflow-hidden"
+    >
     <Navbar 
       socket={socket} 
       chatState={chatState}
