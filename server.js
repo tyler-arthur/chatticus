@@ -95,7 +95,7 @@ io.on('connection', socket => {
     socket.broadcast.to(socket.room).emit('updateChat',
     {
       username: 'Chattibot',
-      message: `${socket.username} has left to this room`
+      message: `${socket.username} has left this room`
     }
     );
     // Update room
