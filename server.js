@@ -21,13 +21,15 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "./client/build/index.html"));
 });
 
+// Array to hold all active rooms
 let rooms = ['General', 'Work', 'Random']
+// Holds sockets current room for display
 let room;
-
+// Stores all usernames until discconnected
 let usernames = {};
-
+// Holds random chat message coloring
 let color;
-
+// List of color class names for random chat color
 const colors = [
   'red-500',
   'red-600',
@@ -54,7 +56,7 @@ const colors = [
   'purple-600',
   'purple-700',
 ]
-
+// Picks a random index from an array
 const colorPicker = (arr, min, max) => {
   const i = Math.floor(Math.random() * (max - min + 1)) + min;
   return arr[i];
@@ -93,7 +95,7 @@ io.on('connection', socket => {
     }
     );
     socket.emit('updateRoom', {rooms: rooms, room: room});
-    socket.broadcast.emit('updateRoom', {rooms: rooms, room: room})
+    socket.broadcast.emit('updateRoom', {rooms: rooms})
   });
 
   // Handle chat messaging
@@ -167,7 +169,6 @@ io.on('connection', socket => {
     socket.leave(socket.room);
   });
 });
-
 
 server.listen(PORT, () => {
   console.log(`🌎 ==> API server now on port ${PORT}!`);

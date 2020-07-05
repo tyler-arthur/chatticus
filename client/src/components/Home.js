@@ -38,8 +38,7 @@ const Home = () => {
     socket.emit('sendChat',
       {
         username: values.username,
-        message: values.message,
-        // newRoom: ""
+        message: values.message
       }
     );
     setValues({ message: "" })

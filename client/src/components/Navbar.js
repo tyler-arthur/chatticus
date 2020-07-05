@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import handleChange from '../utils/useForm';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars} from '@fortawesome/free-solid-svg-icons';
 import { faDoorOpen } from '@fortawesome/free-solid-svg-icons';
@@ -13,8 +12,11 @@ const Navbar = (props) => {
 
   // state for room menus, to open and close
   const [navState, setNavState] = useState(false);
+  // State for all current active rooms
   const [rooms, setRooms] = useState(['General', 'Work', 'Random']);
+  // state for creating new room
   const [newRoom, setNewRoom] = useState("");
+  // State for displaying current room
   const [Room, setRoom] = useState("");
 
   // Sets user to selected room room
@@ -23,6 +25,7 @@ const Navbar = (props) => {
     setNavState(false);
   }
 
+  // Sets up new user created rooms
   const createRoom = e => {
     e.preventDefault();
     socket.emit('createRoom', newRoom);
@@ -114,28 +117,3 @@ const Navbar = (props) => {
 };
 
 export default Navbar;
-
-
-// TODO: Work in progress for dynamic room creation
-// <form className=""
-//   onSubmit={createRoom}
-// >
-//   <label className=""
-//     htmlFor="createRoom"
-//   >
-//   Create a Room
-//   </label>
-//   <input className=""
-//     name="createRoom"
-//     type="text"
-//     required
-//     onChange={handleChange}
-//     value={values.newRoom}
-//   />
-//   <button className=""
-//     type="submit"
-//   >
-//     Create Room
-//   </button>
-// </form>
-// TODO: Work in progress for dynamic room creation
