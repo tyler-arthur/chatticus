@@ -5,7 +5,8 @@ import Navbar from './Navbar';
 import Username from './Username';
 
 // Creating socket for user session
-const socket = io.connect(window.location.hostname || 'http://localhost:3001')
+// const socket = io.connect(window.location.hostname || 'http://localhost:3001')
+const socket = io()
 
 const Home = () => {
 
