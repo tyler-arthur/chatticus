@@ -1,6 +1,10 @@
 {
   "name": "chatticus",
   "version": "1.0.0",
+  "engines": {
+    "yarn": "1.22.4",
+    "node": "12.16.1"
+  },
   "description": "A simple chat web application",
   "main": "server.js",
   "scripts": {
@@ -32,6 +36,5 @@
     "react-cool-onclickoutside": "^1.5.4",
     "react-router-dom": "^5.2.0",
     "socket.io": "^2.3.0"
-  },
-  "proxy": "http://localhost:3001"
+  }
 }
