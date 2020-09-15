@@ -1,5 +1,5 @@
 # Chatticus
-![Overview](chatticus.png)
+![Overview](src\assets\images\chatticus.png)
 
 ## Who made this project?
 
